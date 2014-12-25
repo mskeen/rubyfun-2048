@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'board'
 
 describe Board do
   let(:board) { Board.new(3,2) }

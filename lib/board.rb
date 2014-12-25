@@ -26,17 +26,3 @@ class Board
   end
 
 end
-
-class Tile
-  attr_accessor :value
-
-  def initialize(value)
-    self.value = value
-  end
-end
-
-class EmptyTile
-  def value
-    0
-  end
-end

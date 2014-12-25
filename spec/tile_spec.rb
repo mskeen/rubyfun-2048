@@ -1,4 +1,6 @@
 require 'spec_helper'
+require 'tile'
+require 'empty_tile'
 
 describe Tile do
   it 'returns the initialized value' do
