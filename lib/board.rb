@@ -1,3 +1,6 @@
+require './lib/tile'
+require './lib/empty_tile'
+
 # The main Board object
 class Board
   attr_reader :width, :height
@@ -22,7 +25,14 @@ class Board
   end
 
   def validate_location(column, row)
-    fail "InvalidLocation" unless column > 0 && row > 0 && column <= width && row <= height
+    fail "InvalidLocation" unless [column, row].min > 0 && column <= width && row <= height
+  end
+
+  def draw(window)
+  end
+
+  def tilt(direction)
+    puts "tilt #{direction}"
   end
 
 end
