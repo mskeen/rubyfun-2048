@@ -49,22 +49,20 @@ class Board
   end
 
   def add_random_tile(value = DEFAULT_NEW_TILE_VALUE)
-    loop do
-      if (add_location = random_location).empty?
-        add_location.value = value
-        return
-      end
-    end
+    while !(loc = random_location).empty? do end
+    loc.value = value
+  end
+
+  def player_move(direction)
+    add_random_tile if tilt(direction) > 0 && empty_tile_count > 0
+    locations.each { |loc| loc.reset_for_next_turn }
   end
 
   def tilt(direction)
     fail "InvalidDirection" if TILT_MOVEMENTS[direction].nil?
-    counter = 0
-    loop do
-      break if bump_one_square(direction) == 0
-      counter += 1
-    end
-    add_random_tile if counter > 0 && empty_tile_count > 0
+    move_counter = 0
+    move_counter += 1 while bump_one_square(direction) != 0
+    move_counter
   end
 
   private
@@ -89,14 +87,6 @@ class Board
   end
 
   def move_tile(from_loc, to_loc)
-    if from_loc && to_loc
-      if !from_loc.empty? && (to_loc.empty? || to_loc.value == from_loc.value)
-        to_loc.value += from_loc.value
-        from_loc.value = 0
-        return 1
-      end
-    end
-    0
+    (from_loc && to_loc && to_loc.merge(from_loc)) ? 1 : 0
   end
-
 end

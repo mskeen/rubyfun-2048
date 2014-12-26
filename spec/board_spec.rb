@@ -30,33 +30,79 @@ describe Board do
   end
 
   describe "tilt" do
-    let(:board) { Board.new }
-    before(:each) { board.location(2, 3).value = 2 }
-
     it "throws exception with invalid direction" do
-      expect { board.tilt(:diagonal) }.to raise_error('InvalidDirection')
+      expect { Board.new.tilt(:diagonal) }.to raise_error('InvalidDirection')
     end
 
-    it "moves tiles to the left" do
-      board.tilt(:left)
-      expect(board.location(1, 3).value).to eq 2
-      expect(board.location(2, 3).value).to eq 0
+    describe "directional" do
+      let(:board) { Board.new }
+      before(:each) { board.location(2, 3).value = 2 }
+
+      it "moves tiles left" do
+        board.tilt(:left)
+        expect(board.location(1, 3).value).to eq 2
+        expect(board.location(2, 3).value).to eq 0
+      end
+
+      it "moves tiles right" do
+        board.tilt(:right)
+        expect(board.location(4, 3).value).to eq 2
+        expect(board.location(2, 3).value).to eq 0
+      end
+
+      it "moves tiles up" do
+        board.tilt(:up)
+        expect(board.location(2, 1).value).to eq 2
+        expect(board.location(2, 3).value).to eq 0
+      end
+
+      it "moves tiles down" do
+        board.tilt(:down)
+        expect(board.location(2, 4).value).to eq 2
+        expect(board.location(2, 3).value).to eq 0
+      end
+
+      it "merges matching tiles" do
+      end
     end
 
-    it "moves tiles to the right" do
-      board.tilt(:right)
-      expect(board.location(4, 3).value).to eq 2
-      expect(board.location(2, 3).value).to eq 0
+    describe "merge" do
+      let(:board) { Board.new }
+      before(:each) { board.location(2, 3).value = 2 }
+
+      it "matches identical tiles" do
+        board.location(2,4).value = 2
+        board.tilt(:down)
+        expect(board.location(2,4).value).to eq 4
+      end
+
+      it "doesn't match non-identical tiles" do
+        board.location(2,4).value = 4
+        board.tilt(:up)
+        expect(board.location(2,1).value).to eq 2
+      end
+
+      it "matches the first 2 tiles when 3 are identical" do
+        board.location(1,3).value = 2
+        board.location(3,3).value = 2
+        board.tilt(:left)
+        expect(board.location(1,3).value).to eq 4
+        expect(board.location(2,3).value).to eq 2
+        expect(board.location(3,3).value).to eq 0
+      end
+
+      it "only merges a tile once in a single tilt" do
+        board.location(1,3).value = 2
+        board.location(3,3).value = 2
+        board.location(4,3).value = 2
+        board.tilt(:right)
+        expect(board.location(4,3).value).to eq 4
+        expect(board.location(3,3).value).to eq 4
+        expect(board.location(2,3).value).to eq 0
+      end
+
     end
-    it "moves tiles up" do
-      board.tilt(:up)
-      expect(board.location(2, 1).value).to eq 2
-      expect(board.location(2, 3).value).to eq 0
-    end
-    it "moves tiles down" do
-      board.tilt(:down)
-      expect(board.location(2, 4).value).to eq 2
-      expect(board.location(2, 3).value).to eq 0
-    end
+
+
   end
 end
