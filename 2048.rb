@@ -15,7 +15,6 @@ class GameWindow < Gosu::Window
   def initialize
     super(1280, 960, false)
     self.caption = '2048'
-    @board = Board.new
     board.start_game
   end
 
@@ -23,12 +22,8 @@ class GameWindow < Gosu::Window
     view.draw
   end
 
-  def update
-  end
-
   def button_down(id)
     if handler = KEY_HANDLERS[id]
-      puts id
       handler.call(self)
     end
   end
@@ -38,7 +33,7 @@ class GameWindow < Gosu::Window
   end
 
   def board
-    @board
+    @board ||= Board.new
   end
 
 end

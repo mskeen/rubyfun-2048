@@ -1,5 +1,4 @@
-require './lib/tile'
-require './lib/empty_tile'
+require './lib/location'
 require 'gosu'
 
 # The main Board object
@@ -8,6 +7,8 @@ class Board
 
   DEFAULT_WIDTH = 4
   DEFAULT_HEIGHT = 4
+  DEFAULT_NEW_TILE_COUNT = 2
+  DEFAULT_NEW_TILE_VALUE = 2
 
   TILT_MOVEMENTS = {
     up:    { loopdir: :up,   delta_x: 0,  delta_y: -1 },
@@ -17,40 +18,54 @@ class Board
   }
 
   def initialize(width = DEFAULT_WIDTH, height = DEFAULT_HEIGHT)
-    @tiles = Hash.new(EmptyTile.new)
+    @locations = Hash.new
     @width = width
     @height = height
+    clear_board
   end
 
-  def start_game(add_tile_count = 2)
+  def clear_board
+    (1..width).each do |col|
+      (1..height).each do |row|
+        @locations[[col, row]] = Location.new(col, row, 0)
+      end
+    end
+  end
+
+  def location(col,row)
+    @locations[[col, row]]
+  end
+
+  def each_location(reverse = false)
+    if reverse
+      (width.downto(1)).each do |col|
+        (height.downto(1)).each do |row|
+          yield location(col, row)
+        end
+      end
+    else
+      (1..width).each do |col|
+        (1..height).each do |row|
+          yield location(col, row)
+        end
+      end
+    end
+  end
+
+  def start_game(add_tile_count = DEFAULT_NEW_TILE_COUNT)
     add_tile_count.times { add_random_tile }
   end
 
-  def place_at(column, row, tile)
-    validate_location(column, row)
-    @tiles[[column, row]] = tile
+  def random_location
+    location(rand(width) + 1, rand(height) + 1)
   end
 
-  def tile_at(column, row)
-    validate_location(column, row)
-    @tiles[[column, row]]
-  end
-
-  def valid_location?(column, row)
-    [column, row].min > 0 && column <= width && row <= height
-  end
-
-  def validate_location(column, row)
-    fail "InvalidLocation" unless valid_location?(column, row)
-  end
-
-  def add_random_tile
+  def add_random_tile(value = DEFAULT_NEW_TILE_VALUE)
     loop do
-      col = rand(width) + 1
-      row = rand(height) + 1
-      if tile_at(col,row).empty?
-        place_at(col,row,Tile.new(2))
-        break
+      add_location = random_location
+      if add_location.empty?
+        add_location.value = value
+        return
       end
     end
   end
@@ -58,21 +73,12 @@ class Board
   def tilt(direction)
     tilt_meta = TILT_MOVEMENTS[direction]
     fail "InvalidDirection" if tilt_meta.nil?
-    if tilt_meta[:loop] == :up
-      cols = (1..width)
-      rows = (1..height)
-    else
-      cols = (width.downto(1))
-      rows = (height.downto(1))
-    end
     total_changes = 0
     loop do
       change_count = 0
-      cols.each do |col|
-        rows.each do |row|
-          if swap(col, row, col + tilt_meta[:delta_x], row + tilt_meta[:delta_y])
-            change_count += 1
-          end
+      each_location(tilt_meta[:reverse]) do |loc|
+        if move(loc, location(loc.col + tilt_meta[:delta_x], loc.row + tilt_meta[:delta_y]))
+          change_count += 1
         end
       end
       total_changes += change_count
@@ -81,17 +87,11 @@ class Board
     add_random_tile if total_changes > 0
   end
 
-  def swap(col1, row1, col2, row2)
-    if valid_location?(col1,row1) && valid_location?(col2,row2)
-      tile1 = tile_at(col1, row1)
-      tile2 = tile_at(col2, row2)
-      if tile2.empty? && !tile1.empty?
-        place_at(col1,row1,tile2)
-        place_at(col2,row2,tile1)
-        return true
-      elsif tile2.value == tile1.value && !tile1.empty?
-        place_at(col2,row2, Tile.new(tile1.value * 2))
-        place_at(col1,row1, EmptyTile.new)
+  def move(from_loc, to_loc)
+    if from_loc && to_loc
+      if !from_loc.empty? && (to_loc.empty? || to_loc.value == from_loc.value)
+        to_loc.value += from_loc.value
+        from_loc.value = 0
         return true
       end
     end

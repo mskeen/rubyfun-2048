@@ -24,16 +24,13 @@ class BoardView
   end
 
   def draw
-    (1..board.width).each do |col|
-      (1..board.height).each do |row|
-        tile = board.tile_at(col,row)
-        color = COLORS[tile.value]
-        window.draw_quad(col * 40, row * 40, color,
-          col*40, (row + 1)*40, color,
-          (col+1) * 40, (row + 1)*40, color,
-          (col+1) * 40, row * 40, color)
-        font.draw(tile.value.to_s, col*40, row*40, 1, 1.0, 1.0, 0xaa444400) unless tile.empty?
-      end
+    board.each_location do |loc|
+      color = COLORS[loc.value]
+      window.draw_quad(loc.col * 40, loc.row * 40, color,
+        loc.col*40, (loc.row + 1)*40, color,
+        (loc.col+1) * 40, (loc.row + 1)*40, color,
+        (loc.col+1) * 40, loc.row * 40, color)
+      font.draw(loc.value.to_s, loc.col*40, loc.row*40, 1, 1.0, 1.0, 0xaa444400) unless loc.empty?
     end
   end
 
