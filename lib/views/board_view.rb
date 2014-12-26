@@ -24,7 +24,7 @@ class BoardView
   end
 
   def draw
-    board.each_location do |loc|
+    board.locations.each do |loc|
       color = COLORS[loc.value]
       window.draw_quad(loc.col * 40, loc.row * 40, color,
         loc.col*40, (loc.row + 1)*40, color,

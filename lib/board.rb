@@ -1,5 +1,4 @@
 require './lib/location'
-require 'gosu'
 
 # The main Board object
 class Board
@@ -9,12 +8,11 @@ class Board
   DEFAULT_HEIGHT = 4
   DEFAULT_NEW_TILE_COUNT = 2
   DEFAULT_NEW_TILE_VALUE = 2
-
   TILT_MOVEMENTS = {
-    up:    { loopdir: :up,   delta_x: 0,  delta_y: -1 },
-    down:  { loopdir: :down, delta_x: 0,  delta_y: 1 },
-    left:  { loopdir: :up,   delta_x: -1, delta_y: 0 },
-    right: { loopdir: :down, delta_x: 1,  delta_y: 0 }
+    up:    { reverse: false,   delta_col: 0,  delta_row: -1 },
+    down:  { reverse: true, delta_col: 0,  delta_row: 1 },
+    left:  { reverse: false,   delta_col: -1, delta_row: 0 },
+    right: { reverse: true, delta_col: 1,  delta_row: 0 }
   }
 
   def initialize(width = DEFAULT_WIDTH, height = DEFAULT_HEIGHT)
@@ -36,34 +34,23 @@ class Board
     @locations[[col, row]]
   end
 
-  def each_location(reverse = false)
-    if reverse
-      (width.downto(1)).each do |col|
-        (height.downto(1)).each do |row|
-          yield location(col, row)
-        end
-      end
-    else
-      (1..width).each do |col|
-        (1..height).each do |row|
-          yield location(col, row)
-        end
+  def locations
+    array = []
+    (1..width).each do |col|
+      (1..height).each do |row|
+        array << location(col, row)
       end
     end
+    array
   end
 
   def start_game(add_tile_count = DEFAULT_NEW_TILE_COUNT)
     add_tile_count.times { add_random_tile }
   end
 
-  def random_location
-    location(rand(width) + 1, rand(height) + 1)
-  end
-
   def add_random_tile(value = DEFAULT_NEW_TILE_VALUE)
     loop do
-      add_location = random_location
-      if add_location.empty?
+      if (add_location = random_location).empty?
         add_location.value = value
         return
       end
@@ -71,31 +58,45 @@ class Board
   end
 
   def tilt(direction)
-    tilt_meta = TILT_MOVEMENTS[direction]
-    fail "InvalidDirection" if tilt_meta.nil?
-    total_changes = 0
+    fail "InvalidDirection" if TILT_MOVEMENTS[direction].nil?
+    counter = 0
     loop do
-      change_count = 0
-      each_location(tilt_meta[:reverse]) do |loc|
-        if move(loc, location(loc.col + tilt_meta[:delta_x], loc.row + tilt_meta[:delta_y]))
-          change_count += 1
-        end
-      end
-      total_changes += change_count
-      break if change_count == 0
+      break if bump_one_square(direction) == 0
+      counter += 1
     end
-    add_random_tile if total_changes > 0
+    add_random_tile if counter > 0 && empty_tile_count > 0
   end
 
-  def move(from_loc, to_loc)
+  private
+
+  def empty_tile_count
+    locations.count { |loc| loc.empty? }
+  end
+
+  def random_location
+    location(rand(width) + 1, rand(height) + 1)
+  end
+
+  def neighbour(loc, delta_col, delta_row)
+    location(loc.col + delta_col, loc.row + delta_row)
+  end
+
+  def bump_one_square(direction)
+    tilt = TILT_MOVEMENTS[direction]
+    (tilt[:reverse] ? locations.reverse : locations).inject(0) do |sum, loc|
+      sum + move_tile(loc, neighbour(loc, tilt[:delta_col], tilt[:delta_row]))
+    end
+  end
+
+  def move_tile(from_loc, to_loc)
     if from_loc && to_loc
       if !from_loc.empty? && (to_loc.empty? || to_loc.value == from_loc.value)
         to_loc.value += from_loc.value
         from_loc.value = 0
-        return true
+        return 1
       end
     end
-    false
+    0
   end
 
 end
