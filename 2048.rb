@@ -1,9 +1,8 @@
 require 'gosu'
 require './lib/board.rb'
+require './lib/views/board_view.rb'
 
 class GameWindow < Gosu::Window
-
-  attr_reader :board, :font
 
   KEY_HANDLERS = {
     Gosu::KbUp     => lambda { |game| game.board.tilt(:up) },
@@ -17,16 +16,14 @@ class GameWindow < Gosu::Window
     super(1280, 960, false)
     self.caption = '2048'
     @board = Board.new
-    @board.add_random_tile
-    @font = Gosu::Font.new(self, Gosu::default_font_name, 20)
+    board.start_game
   end
 
   def draw
-    @board.draw(self)
+    view.draw
   end
 
   def update
-
   end
 
   def button_down(id)
@@ -34,6 +31,14 @@ class GameWindow < Gosu::Window
       puts id
       handler.call(self)
     end
+  end
+
+  def view
+    @view ||= BoardView.new(self, board)
+  end
+
+  def board
+    @board
   end
 
 end

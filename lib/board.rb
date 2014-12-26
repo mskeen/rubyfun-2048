@@ -16,25 +16,14 @@ class Board
     right: { loopdir: :down, delta_x: 1,  delta_y: 0 }
   }
 
-  COLORS = {
-    0 => Gosu::Color::GRAY,
-    2 => Gosu::Color::WHITE,
-    4 => Gosu::Color::RED,
-    8 => Gosu::Color::BLUE,
-    16 => Gosu::Color::GREEN,
-    32 => Gosu::Color::GREEN,
-    64 => Gosu::Color::GREEN,
-    128 => Gosu::Color::GREEN,
-    256 => Gosu::Color::GREEN,
-    512 => Gosu::Color::GREEN,
-    1024 => Gosu::Color::GREEN,
-    2048 => Gosu::Color::GREEN
-  }
-
   def initialize(width = DEFAULT_WIDTH, height = DEFAULT_HEIGHT)
     @tiles = Hash.new(EmptyTile.new)
     @width = width
     @height = height
+  end
+
+  def start_game(add_tile_count = 2)
+    add_tile_count.times { add_random_tile }
   end
 
   def place_at(column, row, tile)
@@ -53,20 +42,6 @@ class Board
 
   def validate_location(column, row)
     fail "InvalidLocation" unless valid_location?(column, row)
-  end
-
-  def draw(window)
-    (1..width).each do |col|
-      (1..height).each do |row|
-        tile = tile_at(col,row)
-        color = COLORS[tile.value]
-        window.draw_quad(col * 40, row * 40, color,
-          col*40, (row + 1)*40, color,
-          (col+1) * 40, (row + 1)*40, color,
-          (col+1) * 40, row * 40, color)
-        window.font.draw(tile.value.to_s, col*40, row*40, 1, 1.0, 1.0, 0xaa444400) unless tile.empty?
-      end
-    end
   end
 
   def add_random_tile
