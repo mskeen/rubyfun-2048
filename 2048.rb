@@ -5,10 +5,10 @@ require './lib/views/board_view.rb'
 class GameWindow < Gosu::Window
 
   KEY_HANDLERS = {
-    Gosu::KbUp     => lambda { |game| game.board.player_move(:up) },
-    Gosu::KbDown   => lambda { |game| game.board.player_move(:down) },
-    Gosu::KbLeft   => lambda { |game| game.board.player_move(:left) },
-    Gosu::KbRight  => lambda { |game| game.board.player_move(:right) },
+    Gosu::KbUp     => lambda { |game| game.tilt_board(:up) },
+    Gosu::KbDown   => lambda { |game| game.tilt_board(:down) },
+    Gosu::KbLeft   => lambda { |game| game.tilt_board(:left) },
+    Gosu::KbRight  => lambda { |game| game.tilt_board(:right) },
     Gosu::KbEscape => lambda { |game| game.close }
   }
 
@@ -34,6 +34,10 @@ class GameWindow < Gosu::Window
 
   def board
     @board ||= Board.new
+  end
+
+  def tilt_board(direction)
+    board.player_move(direction)
   end
 
 end

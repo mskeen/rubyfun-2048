@@ -2,7 +2,7 @@ require './lib/location'
 
 # The main Board object
 class Board
-  attr_reader :width, :height
+  attr_reader :width, :height, :locations
 
   DEFAULT_WIDTH = 4
   DEFAULT_HEIGHT = 4
@@ -16,32 +16,23 @@ class Board
   }
 
   def initialize(width = DEFAULT_WIDTH, height = DEFAULT_HEIGHT)
-    @locations = Hash.new
     @width = width
     @height = height
     clear_board
   end
 
   def clear_board
+    @locations = []
     (1..width).each do |col|
       (1..height).each do |row|
-        @locations[[col, row]] = Location.new(col, row, 0)
+        @locations << Location.new(col, row, Location::EMPTY_VALUE)
       end
     end
   end
 
   def location(col,row)
-    @locations[[col, row]]
-  end
-
-  def locations
-    array = []
-    (1..width).each do |col|
-      (1..height).each do |row|
-        array << location(col, row)
-      end
-    end
-    array
+    return nil if col <= 0 || row <= 0 || col > width || row > height
+    @locations[(col - 1) * width + row - 1]
   end
 
   def start_game(add_tile_count = DEFAULT_NEW_TILE_COUNT)

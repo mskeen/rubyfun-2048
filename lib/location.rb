@@ -2,7 +2,9 @@ class Location
   attr_reader :col, :row
   attr_accessor :value
 
-  def initialize(col, row, value = 0)
+  EMPTY_VALUE = 0
+
+  def initialize(col, row, value = EMPTY_VALUE)
     @col = col
     @row = row
     @value = value
@@ -10,14 +12,14 @@ class Location
   end
 
   def empty?
-    self.value == 0
+    self.value == EMPTY_VALUE
   end
 
   def merge(loc)
     if can_merge?(loc)
       @merged_this_turn = true if self.value == loc.value
       self.value += loc.value
-      loc.value = 0
+      loc.value = EMPTY_VALUE
       return true
     end
     false
