@@ -55,11 +55,11 @@ class Board
 
   def player_move(direction)
     add_random_tile if tilt(direction) > 0 && empty_tile_count > 0
-    locations.each { |loc| loc.reset_for_next_turn }
   end
 
   def tilt(direction)
     fail "InvalidDirection" if TILT_MOVEMENTS[direction].nil?
+    locations.each { |loc| loc.reset_for_next_turn }
     move_counter = 0
     move_counter += 1 while bump_one_square(direction) != 0
     move_counter
