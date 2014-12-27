@@ -76,6 +76,13 @@ describe Location do
       board.location(3,2).value = 2
       expect(board.location(1,2).can_move?(:right)).to eq true
     end
+
+    it 'is true when there''s no space but two tiles would be merged' do
+      board.location(2,2).value = 2
+      board.location(3,2).value = 2
+      board.location(4,2).value = 2
+      expect(board.location(2,2).can_move?(:right)).to eq true
+    end
   end
 
 end

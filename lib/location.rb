@@ -36,7 +36,7 @@ class Location
     return false if empty?
     loc = self
     while (loc = loc.neighbour(direction)) do
-      return true if loc.empty?
+      return true if loc.empty? || loc.can_merge?(direction)
     end
     false
   end
