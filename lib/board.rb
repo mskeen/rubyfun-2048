@@ -25,6 +25,10 @@ class Board
     end
   end
 
+  def locations_for_direction(direction)
+    direction && Location::DIRECTIONS[direction][:reverse] ? locations.reverse : locations
+  end
+
   def location(col,row)
     return nil if col <= 0 || row <= 0 || col > width || row > height
     @locations[(col - 1) * width + row - 1]
@@ -40,10 +44,11 @@ class Board
   end
 
   def player_move(direction)
-    @direction = direction
+    @direction = direction if self.direction == :none
   end
 
   def bump(add_random = true)
+    return false if direction == :none
     finalize_merges
     return true if execute_movements
     setup_next_turn(add_random)
@@ -75,8 +80,7 @@ class Board
   end
 
   def execute_movements
-    return false if !(tilt = Location::DIRECTIONS[@direction])
-    (tilt[:reverse] ? locations.reverse : locations).inject(false) do |moved, loc|
+    locations_for_direction(@direction).inject(false) do |moved, loc|
       loc.move(@direction) || loc.merge(@direction) || moved
     end
   end

@@ -13,7 +13,7 @@ class GameWindow < Gosu::Window
   }
 
   def initialize
-    super(1280, 960, false)
+    super(640, 640, false)
     self.caption = '2048'
     board.start_game
   end
@@ -32,12 +32,16 @@ class GameWindow < Gosu::Window
     @view ||= BoardView.new(self, board)
   end
 
+  def update
+    view.update
+  end
+
   def board
     @board ||= Board.new
   end
 
   def tilt_board(direction)
-    board.tilt(direction)
+    board.player_move(direction)
   end
 
 end
