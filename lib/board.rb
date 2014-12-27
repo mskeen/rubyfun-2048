@@ -2,22 +2,17 @@ require './lib/location'
 
 # The main Board object
 class Board
-  attr_reader :width, :height, :locations
+  attr_reader :width, :height, :locations, :direction
 
   DEFAULT_WIDTH = 4
   DEFAULT_HEIGHT = 4
   DEFAULT_NEW_TILE_COUNT = 2
   DEFAULT_NEW_TILE_VALUE = 2
-  TILT_MOVEMENTS = {
-    up:    { reverse: false,   delta_col: 0,  delta_row: -1 },
-    down:  { reverse: true, delta_col: 0,  delta_row: 1 },
-    left:  { reverse: false,   delta_col: -1, delta_row: 0 },
-    right: { reverse: true, delta_col: 1,  delta_row: 0 }
-  }
 
   def initialize(width = DEFAULT_WIDTH, height = DEFAULT_HEIGHT)
     @width = width
     @height = height
+    @direction = :none
     clear_board
   end
 
@@ -25,7 +20,7 @@ class Board
     @locations = []
     (1..width).each do |col|
       (1..height).each do |row|
-        @locations << Location.new(col, row, Location::EMPTY_VALUE)
+        @locations << Location.new(self, col, row, Location::EMPTY_VALUE)
       end
     end
   end
@@ -45,15 +40,28 @@ class Board
   end
 
   def player_move(direction)
-    add_random_tile if tilt(direction) > 0 && empty_tile_count > 0
+    @direction = direction
   end
 
-  def tilt(direction)
-    fail "InvalidDirection" if TILT_MOVEMENTS[direction].nil?
-    locations.each { |loc| loc.reset_for_next_turn }
-    move_counter = 0
-    move_counter += 1 while bump_one_square(direction) != 0
-    move_counter
+  def bump(add_random = true)
+    finalize_merges
+    return true if execute_movements
+    setup_next_turn(add_random)
+    false
+  end
+
+  def tilt(direction, add_random = true)
+    fail "InvalidDirection" if Location::DIRECTIONS[direction].nil?
+    @direction = direction
+    nil while bump(add_random)
+  end
+
+  def to_s
+    a = []
+    (1..height).each do |row|
+      a << locations.select { |loc| loc.row == row }.map(&:value).join
+    end
+    a.join("\n")
   end
 
   private
@@ -66,18 +74,21 @@ class Board
     location(rand(width) + 1, rand(height) + 1)
   end
 
-  def neighbour(loc, delta_col, delta_row)
-    location(loc.col + delta_col, loc.row + delta_row)
-  end
-
-  def bump_one_square(direction)
-    tilt = TILT_MOVEMENTS[direction]
-    (tilt[:reverse] ? locations.reverse : locations).inject(0) do |sum, loc|
-      sum + move_tile(loc, neighbour(loc, tilt[:delta_col], tilt[:delta_row]))
+  def execute_movements
+    return false if !(tilt = Location::DIRECTIONS[@direction])
+    (tilt[:reverse] ? locations.reverse : locations).inject(false) do |moved, loc|
+      loc.move(@direction) || loc.merge(@direction) || moved
     end
   end
 
-  def move_tile(from_loc, to_loc)
-    (from_loc && to_loc && to_loc.merge(from_loc)) ? 1 : 0
+  def finalize_merges
+    locations.each { |loc| loc.merged! if loc.merging? }
   end
+
+  def setup_next_turn(add_random = true)
+    @direction = :none
+    locations.each { |loc| loc.reset_for_next_turn }
+    add_random_tile if add_random && empty_tile_count > 0
+  end
+
 end

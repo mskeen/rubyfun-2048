@@ -39,30 +39,27 @@ describe Board do
       before(:each) { board.location(2, 3).value = 2 }
 
       it "moves tiles left" do
-        board.tilt(:left)
+        board.tilt(:left, false)
         expect(board.location(1, 3).value).to eq 2
         expect(board.location(2, 3).value).to eq 0
       end
 
       it "moves tiles right" do
-        board.tilt(:right)
+        board.tilt(:right, false)
         expect(board.location(4, 3).value).to eq 2
         expect(board.location(2, 3).value).to eq 0
       end
 
       it "moves tiles up" do
-        board.tilt(:up)
+        board.tilt(:up, false)
         expect(board.location(2, 1).value).to eq 2
         expect(board.location(2, 3).value).to eq 0
       end
 
       it "moves tiles down" do
-        board.tilt(:down)
+        board.tilt(:down, false)
         expect(board.location(2, 4).value).to eq 2
         expect(board.location(2, 3).value).to eq 0
-      end
-
-      it "merges matching tiles" do
       end
     end
 
@@ -72,20 +69,20 @@ describe Board do
 
       it "matches identical tiles" do
         board.location(2,4).value = 2
-        board.tilt(:down)
+        board.tilt(:down, false)
         expect(board.location(2,4).value).to eq 4
       end
 
       it "doesn't match non-identical tiles" do
         board.location(2,4).value = 4
-        board.tilt(:up)
+        board.tilt(:up, false)
         expect(board.location(2,1).value).to eq 2
       end
 
       it "matches the first 2 tiles when 3 are identical" do
         board.location(1,3).value = 2
         board.location(3,3).value = 2
-        board.tilt(:left)
+        board.tilt(:left, false)
         expect(board.location(1,3).value).to eq 4
         expect(board.location(2,3).value).to eq 2
         expect(board.location(3,3).value).to eq 0
@@ -95,14 +92,12 @@ describe Board do
         board.location(1,3).value = 2
         board.location(3,3).value = 2
         board.location(4,3).value = 2
-        board.tilt(:right)
+        board.tilt(:right, false)
         expect(board.location(4,3).value).to eq 4
         expect(board.location(3,3).value).to eq 4
         expect(board.location(2,3).value).to eq 0
       end
-
     end
-
 
   end
 end

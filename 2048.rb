@@ -37,7 +37,7 @@ class GameWindow < Gosu::Window
   end
 
   def tilt_board(direction)
-    board.player_move(direction)
+    board.tilt(direction)
   end
 
 end
