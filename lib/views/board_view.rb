@@ -5,18 +5,18 @@ class BoardView
 
   COLORS = {
     'border' => Gosu::Color.argb(0xff404040),
-    0 => Gosu::Color::GRAY,
-    2 => Gosu::Color::WHITE,
-    4 => Gosu::Color::RED,
-    8 => Gosu::Color::BLUE,
-    16 => Gosu::Color::GREEN,
-    32 => Gosu::Color::GREEN,
-    64 => Gosu::Color::GREEN,
-    128 => Gosu::Color::GREEN,
-    256 => Gosu::Color::GREEN,
-    512 => Gosu::Color::GREEN,
-    1024 => Gosu::Color::GREEN,
-    2048 => Gosu::Color::GREEN
+    0 => Gosu::Color.argb(0xff606060),
+    2 => Gosu::Color.argb(0xffeee4da),
+    4 => Gosu::Color.argb(0xffede0c8),
+    8 => Gosu::Color.argb(0xfff2b179),
+    16 => Gosu::Color.argb(0xfff59563),
+    32 => Gosu::Color.argb(0xfff67c5f),
+    64 => Gosu::Color.argb(0xfff65e3b),
+    128 => Gosu::Color.argb(0xffedcf72),
+    256 => Gosu::Color.argb(0xffedcc61),
+    512 => Gosu::Color.argb(0xffedc850),
+    1024 => Gosu::Color.argb(0xffedc850),
+    2048 => Gosu::Color.argb(0xffedc850)
   }
 
   STEPS_PER_BUMP = 4
@@ -78,7 +78,12 @@ class BoardView
           diffx + (loc.col+1) * TILE_SIZE, diffy + (loc.row + 1) * TILE_SIZE, color,
           diffx + (loc.col+1) * TILE_SIZE, diffy + loc.row * TILE_SIZE, color
         )
-        font.draw(loc.value.to_s, diffx + loc.col * TILE_SIZE, diffy + loc.row * TILE_SIZE, 1, 1.0, 1.0, 0xaa444400) unless loc.empty?
+        font.draw_rel(
+          loc.value.to_s,
+          diffx + loc.col * TILE_SIZE + TILE_SIZE / 2,
+          diffy + loc.row * TILE_SIZE + TILE_SIZE / 2,
+          1, 0.5, 0.5, 1.0, 1.0, 0xff444444
+        )
       end
       changes = true if mover
     end
@@ -96,7 +101,7 @@ class BoardView
   end
 
   def font
-    @font ||= Gosu::Font.new(window, Gosu::default_font_name, 20)
+    @font ||= Gosu::Font.new(window, Gosu::default_font_name, 60)
   end
 
 end
