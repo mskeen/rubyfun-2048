@@ -1,4 +1,6 @@
 require 'gosu'
+require './lib/views/tile_view'
+require './lib/views/view_helper'
 
 # A Gosu view of the board
 class BoardView
@@ -23,7 +25,7 @@ class BoardView
 
   STEPS_PER_BUMP = 4
   TILE_SIZE = 100
-  BORDER = 10
+  BORDER = 5
 
   def initialize(window, board)
     @window = window
@@ -45,22 +47,11 @@ class BoardView
   def draw
     changes = false
     ui = UI['border']
-    window.draw_quad(
-      TILE_SIZE, TILE_SIZE, ui[:back_color],
-      TILE_SIZE, (board.height + 1) * TILE_SIZE, ui[:back_color],
-      (board.width + 1) * TILE_SIZE, (board.height + 1) * TILE_SIZE, ui[:back_color],
-      (board.width + 1) * TILE_SIZE, TILE_SIZE, ui[:back_color]
-    )
+    ViewHelper.draw_square(window, ui[:back_color], TILE_SIZE - BORDER, TILE_SIZE - BORDER,
+      (board.width + 1) * TILE_SIZE + BORDER, (board.height + 1) * TILE_SIZE + BORDER)
 
-    board.locations.each do |loc|
-      if loc.empty?
-        window.draw_quad(
-          loc.col * TILE_SIZE + BORDER, loc.row * TILE_SIZE + BORDER, UI[0][:back_color],
-          loc.col * TILE_SIZE + BORDER, (loc.row + 1) * TILE_SIZE - BORDER, UI[0][:back_color],
-          (loc.col+1) * TILE_SIZE - BORDER, (loc.row + 1) * TILE_SIZE - BORDER, UI[0][:back_color],
-          (loc.col+1) * TILE_SIZE - BORDER, loc.row * TILE_SIZE + BORDER, UI[0][:back_color]
-        )
-      end
+    board.locations.select{ |loc| loc.empty? }.each do |loc|
+      TileView.draw(window, loc, UI[0][:back_color])
     end
 
     board.locations.each do |loc|
@@ -69,17 +60,11 @@ class BoardView
       diffy = mover ? TILE_SIZE / STEPS_PER_BUMP * @tick * Location::DIRECTIONS[board.direction][:delta_row] : 0
       ui = UI[loc.value]
       if !loc.empty?
-        window.draw_quad(
-          loc.col * TILE_SIZE + BORDER, loc.row * TILE_SIZE + BORDER, UI[0][:back_color],
-          loc.col * TILE_SIZE + BORDER, (loc.row + 1) * TILE_SIZE - BORDER, UI[0][:back_color],
-          (loc.col+1) * TILE_SIZE - BORDER, (loc.row + 1) * TILE_SIZE - BORDER, UI[0][:back_color],
-          (loc.col+1) * TILE_SIZE - BORDER, loc.row * TILE_SIZE + BORDER, UI[0][:back_color]
+        ViewHelper.draw_square(window, UI[0][:back_color], loc.col * TILE_SIZE + BORDER, loc.row * TILE_SIZE + BORDER,
+          (loc.col+1) * TILE_SIZE - BORDER, (loc.row + 1) * TILE_SIZE - BORDER
         )
-        window.draw_quad(
-          diffx + loc.col * TILE_SIZE + BORDER, diffy + loc.row * TILE_SIZE + BORDER, ui[:back_color],
-          diffx + loc.col * TILE_SIZE + BORDER, diffy + (loc.row + 1) * TILE_SIZE - BORDER, ui[:back_color],
-          diffx + (loc.col+1) * TILE_SIZE - BORDER, diffy + (loc.row + 1) * TILE_SIZE - BORDER, ui[:back_color],
-          diffx + (loc.col+1) * TILE_SIZE - BORDER, diffy + loc.row * TILE_SIZE + BORDER, ui[:back_color]
+        ViewHelper.draw_square(window, ui[:back_color], diffx + loc.col * TILE_SIZE + BORDER, diffy + loc.row * TILE_SIZE + BORDER,
+          diffx + (loc.col+1) * TILE_SIZE - BORDER, diffy + (loc.row + 1) * TILE_SIZE - BORDER
         )
         font.draw_rel(
           loc.value.to_s,

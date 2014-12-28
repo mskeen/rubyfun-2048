@@ -7,7 +7,7 @@ class Board
   DEFAULT_WIDTH = 4
   DEFAULT_HEIGHT = 4
   DEFAULT_NEW_TILE_COUNT = 2
-  DEFAULT_NEW_TILE_VALUE = 2
+  NEW_TILE_DISTRIBUTION = [2,2,2,2,2,2,2,2,2,4]
 
   def initialize(width = DEFAULT_WIDTH, height = DEFAULT_HEIGHT)
     @width = width
@@ -38,9 +38,9 @@ class Board
     add_tile_count.times { add_random_tile }
   end
 
-  def add_random_tile(value = DEFAULT_NEW_TILE_VALUE)
+  def add_random_tile
     while !(loc = random_location).empty? do end
-    loc.value = value
+    loc.value = NEW_TILE_DISTRIBUTION[rand(NEW_TILE_DISTRIBUTION.size)]
   end
 
   def player_move(direction)
@@ -50,7 +50,10 @@ class Board
   def bump(add_random = true)
     return false if direction == :none
     finalize_merges
-    return true if execute_movements
+    if execute_movements
+      @turn_changes = true
+      return true
+    end
     setup_next_turn(add_random)
     false
   end
@@ -59,14 +62,6 @@ class Board
     fail "InvalidDirection" if Location::DIRECTIONS[direction].nil?
     @direction = direction
     nil while bump(add_random)
-  end
-
-  def to_s
-    a = []
-    (1..height).each do |row|
-      a << locations.select { |loc| loc.row == row }.map(&:value).join
-    end
-    a.join("\n")
   end
 
   private
@@ -92,7 +87,8 @@ class Board
   def setup_next_turn(add_random = true)
     @direction = :none
     locations.each { |loc| loc.reset_for_next_turn }
-    add_random_tile if add_random && empty_tile_count > 0
+    add_random_tile if add_random && @turn_changes && empty_tile_count > 0
+    @turn_changes = false
   end
 
 end
