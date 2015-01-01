@@ -14,7 +14,6 @@ class BoardView
   def initialize(window, board)
     @window = window
     @board = board
-    window.caption = '2048'
     new_frame
   end
 
@@ -29,7 +28,6 @@ class BoardView
   end
 
   def draw
-    changes = false
     draw_background
     new_frame unless draw_tiles
   end
