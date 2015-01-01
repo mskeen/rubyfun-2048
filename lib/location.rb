@@ -8,12 +8,12 @@ class Location
 
   EMPTY_VALUE = 0
   DIRECTIONS = {
+    none:  { reverse: false, delta_col:  0,  delta_row:  0 },
     up:    { reverse: false, delta_col:  0,  delta_row: -1 },
     down:  { reverse: true,  delta_col:  0,  delta_row:  1 },
     left:  { reverse: false, delta_col: -1,  delta_row:  0 },
     right: { reverse: true,  delta_col:  1,  delta_row:  0 }
   }
-
 
   def initialize(board, col, row, value = EMPTY_VALUE)
     @board = board
