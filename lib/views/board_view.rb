@@ -30,6 +30,7 @@ class BoardView
   def draw
     draw_background
     new_frame unless draw_tiles
+    show_score
   end
 
   def draw_background
@@ -67,6 +68,19 @@ class BoardView
 
   def tile_view
     @tile_view ||= TileView.new(window, TILE_SIZE, BORDER_SIZE)
+  end
+
+  def show_score
+    font.draw_rel(
+      board.score.to_s,
+      window.width / 2,
+      40,
+      1, 0.5, 0.5, 1.0, 1.0, 0xffffffff
+    )
+  end
+
+  def font
+    @font ||= Gosu::Font.new(window, Gosu::default_font_name, 30)
   end
 
 end

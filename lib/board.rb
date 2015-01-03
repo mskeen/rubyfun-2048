@@ -3,6 +3,7 @@ require './lib/location'
 # The main Board object
 class Board
   attr_reader :width, :height, :locations, :direction
+  attr_accessor :score
 
   DEFAULT_WIDTH = 4
   DEFAULT_HEIGHT = 4
@@ -17,6 +18,7 @@ class Board
   end
 
   def clear_board
+    @score = 0
     @locations = []
     (1..width).each do |col|
       (1..height).each do |row|

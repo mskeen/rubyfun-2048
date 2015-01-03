@@ -58,6 +58,7 @@ class Location
     new_loc = neighbour(direction)
     new_loc.value += self.value
     new_loc.merging!
+    board.score += new_loc.value
     self.value = EMPTY_VALUE
     true
   end
