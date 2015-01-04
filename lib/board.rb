@@ -3,7 +3,7 @@ require './lib/location'
 # The main Board object
 class Board
   attr_reader :width, :height, :locations, :direction
-  attr_accessor :score
+  attr_accessor :score, :move_count
 
   DEFAULT_WIDTH = 4
   DEFAULT_HEIGHT = 4
@@ -18,7 +18,7 @@ class Board
   end
 
   def clear_board
-    @score = 0
+    @score = @move_count = 0
     @locations = []
     (1..width).each do |col|
       (1..height).each do |row|
@@ -43,6 +43,7 @@ class Board
   def add_random_tile
     while !(loc = random_location).empty? do end
     loc.value = NEW_TILE_DISTRIBUTION[rand(NEW_TILE_DISTRIBUTION.size)]
+    @move_count += 1
   end
 
   def player_move(direction)

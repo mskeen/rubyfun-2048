@@ -30,7 +30,7 @@ class BoardView
   def draw
     draw_background
     new_frame unless draw_tiles
-    show_score
+    show_stats
   end
 
   def draw_background
@@ -70,12 +70,13 @@ class BoardView
     @tile_view ||= TileView.new(window, TILE_SIZE, BORDER_SIZE)
   end
 
-  def show_score
-    font.draw_rel(
-      board.score.to_s,
-      window.width / 2,
-      40,
-      1, 0.5, 0.5, 1.0, 1.0, 0xffffffff
+  def show_stats
+    middlex = TILE_SIZE * (board.width / 2 + 1)
+    font.draw_rel("Score: #{board.score.to_s}",
+      middlex, 20, 1, 0.5, 0.5, 1.0, 1.0, 0xffffffff
+    )
+    font.draw_rel("Tile Count: #{board.move_count.to_s}",
+      middlex, 50, 1, 0.5, 0.5, 1.0, 1.0, 0xffffffff
     )
   end
 
