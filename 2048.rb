@@ -9,6 +9,7 @@ class GameWindow < Gosu::Window
     Gosu::KbDown   => lambda { |game| game.tilt_board(:down) },
     Gosu::KbLeft   => lambda { |game| game.tilt_board(:left) },
     Gosu::KbRight  => lambda { |game| game.tilt_board(:right) },
+    Gosu::KbSpace  => lambda { |game| game.restart },
     Gosu::KbEscape => lambda { |game| game.close }
   }
 
@@ -38,6 +39,10 @@ class GameWindow < Gosu::Window
 
   def board
     @board ||= Board.new
+  end
+
+  def restart
+    @board = Board.new if @board.game_over?
   end
 
   def tilt_board(direction)

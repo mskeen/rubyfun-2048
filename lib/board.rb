@@ -67,7 +67,21 @@ class Board
     nil while bump(add_random)
   end
 
+  def game_over?
+    empty_tile_count == 0 && !can_move?
+  end
+
   private
+
+  def can_move?
+    locations.each do |loc|
+      if loc.col < @width && loc.value == location(loc.col + 1, loc.row).value ||
+        loc.row < @height && loc.value == location(loc.col, loc.row + 1).value
+        return true
+      end
+    end
+    false
+  end
 
   def empty_tile_count
     locations.count { |loc| loc.empty? }

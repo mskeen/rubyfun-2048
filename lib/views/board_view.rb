@@ -31,6 +31,7 @@ class BoardView
     draw_background
     new_frame unless draw_tiles
     show_stats
+    show_game_over_message if board.game_over?
   end
 
   def draw_background
@@ -78,6 +79,14 @@ class BoardView
     font.draw_rel("Tile Count: #{board.move_count.to_s}",
       middlex, 50, 1, 0.5, 0.5, 1.0, 1.0, 0xffffffff
     )
+  end
+
+  def show_game_over_message
+    middlex = TILE_SIZE * (board.width / 2 + 1)
+    font.draw_rel("Game Over", middlex + 4, TILE_SIZE * 2.5 + 4, 1, 0.5, 0.5, 1.0, 1.0, 0xff000000 )
+    font.draw_rel("Game Over", middlex, TILE_SIZE * 2.5, 1, 0.5, 0.5, 1.0, 1.0, 0xffffffff )
+    font.draw_rel("Press <space> to play again.", middlex + 4, TILE_SIZE * 3.5 + 4, 1, 0.5, 0.5, 1.0, 1.0, 0xff000000 )
+    font.draw_rel("Press <space> to play again.", middlex, TILE_SIZE * 3.5, 1, 0.5, 0.5, 1.0, 1.0, 0xffffffff )
   end
 
   def font
